@@ -1,11 +1,13 @@
 package pl.logren12.broadside.model;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+
 
 @Getter
 public class Captain {
@@ -66,5 +68,10 @@ public class Captain {
             }
         }
         return damage;
+    }
+    public void changeShip(Ship newShip){
+        if (newShip.getType().tier > this.ship.getType().tier) {
+            this.ship = newShip;
+        }
     }
 }

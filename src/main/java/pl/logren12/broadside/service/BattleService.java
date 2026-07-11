@@ -16,26 +16,51 @@ public class BattleService {
         this.navalCombatService = navalCombatService;
         this.aiService = aiService;
     }
-    public TurnOutcome processTurn(Captain captain1, CaptainAction action1, Captain captain2, CaptainAction action2){
+
+    /**
+     * Processes a full turn between two captains.
+     * <p/>
+     * First checks whether both captains are able to perform round. Then invokes NavalCombatService
+     * to determine who won maneuvering phase and
+     * (if needed) performs crew fight or pases on information about player's successful escape.
+     *
+     * @param captain1 First Captain participating in current battle round
+     * @param action1  CaptainAction declared by captain1
+     * @param captain2 Second Captain participating in current battle round
+     * @param action2  CaptainAction declared by captain2
+     * @return TurnOutcome object: ONGOING, ESCAPED, CAPTAIN1_DEFEATED, CAPTAIN2_DEFEATED, or BOTH_DESTROYED
+     */
+    public TurnOutcome processTurn(Captain captain1, CaptainAction action1, Captain captain2, CaptainAction action2) {
+        // check whether both captains are suitable to play round
         TurnOutcome shipCondition = checkShipConditions(captain1, captain2);
         if (shipCondition != TurnOutcome.ONGOING) return shipCondition;
 
-        TurnOutcome navalPhaseOutcome = this.navalCombatService.resolveNavalPhase(captain1, action1 ,captain2, action2);
+        // check if any captain managed to escape or board enemy ship. If not calculate damage dealt by firing canons
+        TurnOutcome navalPhaseOutcome = this.navalCombatService.resolveNavalPhase(captain1, action1, captain2, action2);
 
         if (navalPhaseOutcome == TurnOutcome.CREW_FIGHT_INITIATED) {
             return resolveCrewFight(captain1, captain2);
-        }
-        else if (navalPhaseOutcome == TurnOutcome.ESCAPED) {
+        } else if (navalPhaseOutcome == TurnOutcome.ESCAPED) {
             return TurnOutcome.ESCAPED;
         }
         // TurnOutcome.ONGOING:
-        else return checkShipConditions(captain1, captain2);
+        else {
+            TurnOutcome turnOutcome = checkShipConditions(captain1, captain2);
+            if (turnOutcome == TurnOutcome.CAPTAIN1_DEFEATED) {
+                captain2.getShip().repair();
+            } else if (turnOutcome == TurnOutcome.CAPTAIN2_DEFEATED) {
+                captain1.getShip().repair();
+            }
+            return turnOutcome;
+        }
     }
+
     // Player versus Bot
-    public TurnOutcome processTurn(Captain captain1, CaptainAction action1, Captain captain2){
+    public TurnOutcome processTurn(Captain captain1, CaptainAction action1, Captain captain2) {
         CaptainAction action2 = this.aiService.aiActionDecision(captain2);
         return this.processTurn(captain1, action1, captain2, action2);
     }
+
     // Bot versus Bot
     public TurnOutcome processTurn(Captain captain1, Captain captain2) {
         CaptainAction action1 = this.aiService.aiActionDecision(captain1);
@@ -43,24 +68,34 @@ public class BattleService {
         return this.processTurn(captain1, action1, captain2, action2);
     }
 
-    private TurnOutcome resolveCrewFight(Captain captain1, Captain captain2){
+    private TurnOutcome resolveCrewFight(Captain captain1, Captain captain2) {
         TurnOutcome result = checkCrewState(captain1, captain2);
-        while (result == TurnOutcome.ONGOING){
+        while (result == TurnOutcome.ONGOING) {
             int damage1 = captain1.crewAttack();
             int damage2 = captain2.crewAttack();
             captain1.getShip().receiveDamage(Collections.nCopies(damage2, 4)); // 4 is a crew code in receiveDamage
             captain2.getShip().receiveDamage(Collections.nCopies(damage1, 4));
             result = checkCrewState(captain1, captain2);
         }
+        if (result == TurnOutcome.CAPTAIN1_DEFEATED) {
+            captain2.changeShip(captain1.getShip());
+            captain2.getShip().repair();
+        }
+        if (result == TurnOutcome.CAPTAIN2_DEFEATED) {
+            captain1.changeShip(captain2.getShip());
+            captain1.getShip().repair();
+        }
         return result;
     }
-    private TurnOutcome checkCrewState(Captain captain1, Captain captain2){
-        if (captain1.getShip().getCrew() == 0 && captain2.getShip().getCrew() == 0) return TurnOutcome.BOTH_DESTROYED;
-        if (captain1.getShip().getCrew() == 0) return TurnOutcome.CAPTAIN1_DEFEATED;
-        if (captain2.getShip().getCrew() == 0) return TurnOutcome.CAPTAIN2_DEFEATED;
+
+    private TurnOutcome checkCrewState(Captain captain1, Captain captain2) {
+        if (captain1.getShip().getCrew() <= 0 && captain2.getShip().getCrew() <= 0) return TurnOutcome.BOTH_DESTROYED;
+        if (captain1.getShip().getCrew() <= 0) return TurnOutcome.CAPTAIN1_DEFEATED;
+        if (captain2.getShip().getCrew() <= 0) return TurnOutcome.CAPTAIN2_DEFEATED;
         else return TurnOutcome.ONGOING;
     }
-    private TurnOutcome checkShipConditions(Captain captain1, Captain captain2){
+
+    private TurnOutcome checkShipConditions(Captain captain1, Captain captain2) {
         if (captain1.getShip().isDestroyed() && captain2.getShip().isDestroyed()) return TurnOutcome.BOTH_DESTROYED;
         if (captain1.getShip().isDestroyed()) return TurnOutcome.CAPTAIN1_DEFEATED;
         if (captain2.getShip().isDestroyed()) return TurnOutcome.CAPTAIN2_DEFEATED;
