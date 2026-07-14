@@ -1,12 +1,20 @@
 package pl.logren12.broadside.model;
 
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Getter
+@NoArgsConstructor
+@Entity
 public class Ship {
-    private final ShipType type;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    @Enumerated(EnumType.STRING)
+    private ShipType type;
     private int hull;
     private int hold;
     private int sails;

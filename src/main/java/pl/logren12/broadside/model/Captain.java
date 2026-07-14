@@ -1,21 +1,32 @@
 package pl.logren12.broadside.model;
 
+import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-
+@Entity
 @Getter
+@NoArgsConstructor
 public class Captain {
-    private final String name;
-    private final Faction faction;
-    private final boolean isBot;
-    private final int sailing;
-    private final int leadership;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    private String name;
+
+    @Enumerated(EnumType.STRING)
+    private Faction faction;
+
+    private boolean isBot;
+    private int sailing;
+    private int leadership;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "shipId")
     private Ship ship;
 
 
@@ -31,7 +42,6 @@ public class Captain {
     public Captain(String name, Faction faction, Ship ship) {
         this(name, faction,true, ship, 0,0);
     }
-
     public List<Integer> rollTheDice(int noDice){
         List<Integer> diceRoll = new ArrayList<>(noDice);
         for(int i = 0; i < noDice; i++){
@@ -73,5 +83,13 @@ public class Captain {
         if (newShip.getType().tier > this.ship.getType().tier) {
             this.ship = newShip;
         }
+    }
+    public CaptainAction decideAction() {
+        if (this.getShip().getCanons() <= 0) return CaptainAction.BOARD;
+        return CaptainAction.FIRE;
+        }
+    @Override
+    public String toString() {
+        return String.format("Captain: %s \n Faction: %s isBot: %b %n Sailing: %d Leadership: %d, Ship %s", this.name, this.faction.toString(), this.isBot, this.sailing, this.leadership, this.getShip().getType());
     }
 }
