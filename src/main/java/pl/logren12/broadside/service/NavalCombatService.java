@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 public class NavalCombatService {
 
-    private int countScore(List<Integer> roll){
+    private int calculateScore(List<Integer> roll){
         int score = 0;
         for (int i : roll) {
             if( i >= 5) {
@@ -33,8 +33,8 @@ public class NavalCombatService {
      */
     public TurnOutcome resolveNavalPhase(Captain captain1, CaptainAction action1, Captain captain2, CaptainAction action2){
         // 1. Determine who won maneuvering phase
-        int score1 = countScore(captain1.maneuver());
-        int score2 = countScore(captain2.maneuver());
+        int score1 = calculateScore(captain1.maneuver());
+        int score2 = calculateScore(captain2.maneuver());
         Captain winner;
         Captain loser;
         CaptainAction winningAction;
