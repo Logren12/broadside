@@ -68,7 +68,7 @@ public class NavalCombatService {
         }
         // Apply winning action
         if(winningAction == CaptainAction.ESCAPE){
-            return TurnOutcome.ESCAPED;
+            return TurnOutcome.CAPTAIN_ESCAPED;
         } else if (winningAction == CaptainAction.BOARD) {
             return TurnOutcome.CREW_FIGHT_INITIATED;
         } else if (winningAction == CaptainAction.FIRE) {
