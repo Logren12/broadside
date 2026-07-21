@@ -9,5 +9,4 @@ public class BroadsideApplication {
     public static void main(String[] args) {
         SpringApplication.run(BroadsideApplication.class, args);
     }
-
 }

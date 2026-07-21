@@ -5,7 +5,7 @@ public enum ShipType {
     FLYUT(2,2,1,2,2,2),
     FRIGATE(3,3,3,3,3,3),
     GALLEON(4,5,3,3,4,4),
-    SHIP_OFTHE_LINE(5,5,5,5,5,5);
+    SHIP_OF_THE_LINE(5,5,5,5,5,5);
 
     public final int maxHull;
     public final int maxHold;

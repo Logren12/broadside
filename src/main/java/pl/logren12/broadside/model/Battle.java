@@ -18,23 +18,17 @@ public class Battle {
     private Captain captain2;
     private int currentRound;
     @Enumerated(EnumType.STRING)
-    private TurnOutcome status;
+    private BattleStatus status;
 
-    public Battle(Captain captain1, Captain captain2) {
-        this.captain1 = captain1;
-        this.captain2 = captain2;
+    public Battle(Captain c1, Captain c2){
+        this.captain1 = c1;
+        this.captain2 = c2;
+        this.currentRound = 0;
+        this.status = BattleStatus.ONGOING;
     }
 }
-// niby jedna bitwa może mieć wiele rund, ale currentRound może być tylko jedno. To odniesienie do tabeli z rundami one to many?
-// moment currentRound to nie jest chyba żadne odniesienie tylko ilość już rozegranych rund? hmmm
-
 /*
-jeden kapitan wiele bitew, ale jedna bitwa może mieć tylko jednego kapitana.
-z perspektywy kapitana one to many
-z perspektywy bitwy: many to one?
-
 id  captain1Id  captain2Id  currentRound                                status
 1   1           2           13                                          CAPTAIN2DEFEATED
-3   1           2           15(odniesienie do JEDNEJ rundy?)            ONGOING
-
+3   1           3           3                                           ONGOING
 * */

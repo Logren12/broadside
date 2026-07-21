@@ -22,25 +22,26 @@ public class Captain {
     @Enumerated(EnumType.STRING)
     private Faction faction;
 
-    private boolean isBot;
-    private int sailing;
-    private int leadership;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "shipId")
     private Ship ship;
+    private int sailing;
+    private int leadership;
+    private boolean bot;
 
-
-    public Captain(String name, Faction faction, boolean isBot, Ship ship, int sailingModifier, int leadershipModifier) {
+    // default constructor
+    public Captain(String name, Faction faction, Ship ship, int sailingModifier, int leadershipModifier, boolean bot) {
         this.name = name;
         this.faction = faction;
-        this.isBot = isBot;
         this.ship = ship;
         this.sailing = faction.baseSailingSkill + sailingModifier;
         this.leadership = faction.baseLeadershipSkill + leadershipModifier;
+        this.bot = bot;
     }
-    // bot constructor
+
+    // bot constructor (no modifiers)
     public Captain(String name, Faction faction, Ship ship) {
-        this(name, faction,true, ship, 0,0);
+        this(name, faction, ship, 0,0, true);
     }
     public List<Integer> rollTheDice(int noDice){
         List<Integer> diceRoll = new ArrayList<>(noDice);
@@ -90,6 +91,6 @@ public class Captain {
         }
     @Override
     public String toString() {
-        return String.format("Captain: %s \n Faction: %s isBot: %b %n Sailing: %d Leadership: %d, Ship %s", this.name, this.faction.toString(), this.isBot, this.sailing, this.leadership, this.getShip().getType());
+        return String.format("Captain: %s \n Faction: %s isBot: %b %n Sailing: %d Leadership: %d, Ship %s", this.name, this.faction.toString(), this.bot, this.sailing, this.leadership, this.getShip().getType());
     }
 }
