@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(name="battles")
 public class Battle {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

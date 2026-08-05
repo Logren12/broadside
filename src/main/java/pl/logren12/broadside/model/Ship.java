@@ -9,6 +9,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @Entity
+@Table(name="ships")
 public class Ship {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

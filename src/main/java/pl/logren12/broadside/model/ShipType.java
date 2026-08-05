@@ -2,7 +2,7 @@ package pl.logren12.broadside.model;
 
 public enum ShipType {
     SLOOP(2,1,2,1,2,1),
-    FLYUT(2,2,1,2,2,2),
+    FLUYT(2,2,1,2,2,2),
     FRIGATE(3,3,3,3,3,3),
     GALLEON(4,5,3,3,4,4),
     SHIP_OF_THE_LINE(5,5,5,5,5,5);

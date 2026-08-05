@@ -12,6 +12,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(name = "captains")
 public class Captain {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
