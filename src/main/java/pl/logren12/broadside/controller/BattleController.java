@@ -1,14 +1,14 @@
 package pl.logren12.broadside.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import pl.logren12.broadside.model.*;
 import pl.logren12.broadside.repository.BattleRepository;
 import pl.logren12.broadside.service.BattleService;
 
 @RestController
+@RequestMapping("/battles")
 public class BattleController {
     // services
     private final BattleService battleService;
@@ -35,9 +35,10 @@ public class BattleController {
         response.append(battleService.processRound(mockCaptain, action, mockCaptain2, action2).toString());
         return response.toString();
     }
-    @GetMapping("/get-battles")
-    public Battle playRound(@RequestParam String battleId){
-        return this.battleRepository.findAll().getFirst();
+    @GetMapping("/{battleId}")
+    public Battle getBattle(@PathVariable long battleId){
+        return this.battleRepository.findById(battleId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Battle not found"));
     }
     @PostMapping("/create-battle")
     public Battle createBattle(@RequestParam String captain1Name, @RequestParam String captain2Name){
