@@ -13,7 +13,7 @@ import java.util.List;
 public class Ship {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
     @Enumerated(EnumType.STRING)
     private ShipType type;
     private int hull;

@@ -16,7 +16,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Captain {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     private String name;
 

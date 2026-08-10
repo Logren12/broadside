@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class Battle {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Captain captain1; // powiązane z tabelą kapitanów. Odniesienie trzymamy tutaj. Czyli many to one?
