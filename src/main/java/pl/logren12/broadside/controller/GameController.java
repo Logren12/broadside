@@ -34,20 +34,17 @@ public class GameController {
             return this.playerService.createPlayerCaptain(name, faction, shipType,0,0);
         }
     }
-
     @GetMapping("/stat-check")
-    public ResponseEntity<List<Captain>> statCheck( //todo Implement search logic for multiple arguments
-            @RequestParam(required = false) String captainName,
+    public ResponseEntity<List<Captain>> statCheck(
             @RequestParam(required = false) Long id,
-            @RequestParam(required = false) Faction faction){
-
-        if (captainName != null && !captainName.isBlank()) {
+            @RequestParam(required = false) String captainName,
+            @RequestParam(required = false) Faction faction) {
+        //todo Implement search logic for multiple arguments
+        if (id != null) {
+            return captainRepository.findById(id).map(List::of).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        } else if (captainName != null && !captainName.isBlank()) {
             return ResponseEntity.ok(captainRepository.findByName(captainName));
-        }else if (id != null) {
-            return captainRepository.findById(id)
-                    .map(List::of)
-                    .map(ResponseEntity::ok).orElseGet(()->ResponseEntity.notFound().build());
-        }else if (faction != null){
+        } else if (faction != null) {
             return ResponseEntity.ok(captainRepository.findByFaction(faction));
         }
         return ResponseEntity.badRequest().build();
