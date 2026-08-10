@@ -30,8 +30,13 @@ public class Captain {
     private int leadership;
     private boolean bot;
 
-    // default constructor
     public Captain(String name, Faction faction, Ship ship, int sailingModifier, int leadershipModifier, boolean bot) {
+        if (sailingModifier < 0){
+            throw new IllegalArgumentException("Modifiers cannot be negative: " + sailingModifier);
+        }
+        if(leadershipModifier < 0){
+            throw new IllegalArgumentException("Modifiers cannot be negative: " + leadershipModifier);
+        }
         this.name = name;
         this.faction = faction;
         this.ship = ship;
@@ -73,9 +78,10 @@ public class Captain {
 
     public int crewAttack(){
         List<Integer> roll = this.rollTheDice(this.leadership);
+        int crewCap = this.ship.getCrew();
         int damage = 0;
         for (int die : roll){
-            if ((die == 5 || die == 6) && (damage < this.ship.getCrew())){
+            if ((die == 5 || die == 6) && (damage < crewCap)){
                 damage++;
             }
         }
@@ -90,6 +96,15 @@ public class Captain {
         if (this.getShip().getCanons() <= 0) return CaptainAction.BOARD;
         return CaptainAction.FIRE;
         }
+
+    public void levelUp(SkillType skillType){
+        switch(skillType){
+            case SAILING -> this.sailing ++;
+            case LEADERSHIP -> this.leadership ++;
+            default -> throw new IllegalStateException("Unhandled skill type: " + skillType);
+        }
+    }
+
     @Override
     public String toString() {
         return String.format("Captain: %s \n Faction: %s isBot: %b %n Sailing: %d Leadership: %d, Ship %s", this.name, this.faction.toString(), this.bot, this.sailing, this.leadership, this.getShip().getType());
