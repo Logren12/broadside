@@ -43,7 +43,7 @@ public class BattleService {
         BattleStatus shipCondition = checkShipConditions(captain1, captain2);
         if (shipCondition != BattleStatus.ONGOING) return shipCondition;
 
-        // check if any captain managed to escape or board enemy ship. If not calculate damage dealt by firing canons
+        // check if any captain managed to escape or board enemy ship
         TurnOutcome navalPhaseOutcome = this.navalCombatService.resolveNavalPhase(captain1, action1, captain2, action2);
         if (navalPhaseOutcome == TurnOutcome.CREW_FIGHT_INITIATED) {
             return resolveCrewFight(captain1, captain2);
@@ -52,12 +52,13 @@ public class BattleService {
         }
         // TurnOutcome.ONGOING:
         else {
+            // determine damage dealt by canon fire
             BattleStatus shipConditions = checkShipConditions(captain1, captain2);
-            if (shipConditions == BattleStatus.CAPTAIN1_DEFEATED) {
-                captain2.getShip().repair();
-            } else if (shipConditions == BattleStatus.CAPTAIN2_DEFEATED) {
-                captain1.getShip().repair();
+            switch (shipConditions) {
+                case CAPTAIN1_DEFEATED -> captain2.getShip().repair();
+                case CAPTAIN2_DEFEATED -> captain1.getShip().repair();
             }
+            // todo Log the battle to database?
             return shipConditions;
         }
     }
