@@ -10,13 +10,13 @@ import pl.logren12.broadside.service.PlayerService;
 import java.util.List;
 
 @RestController
-public class GameController {
+public class CampaignController {
 
     private final PlayerService playerService;
     private final AiService aiService;
     private final CaptainRepository captainRepository;
 
-    public GameController(PlayerService playerService, AiService aiService, CaptainRepository captainRepository) {
+    public CampaignController(PlayerService playerService, AiService aiService, CaptainRepository captainRepository) {
         this.playerService = playerService;
         this.aiService = aiService;
         this.captainRepository = captainRepository;
