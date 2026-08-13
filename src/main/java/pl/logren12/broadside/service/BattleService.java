@@ -40,26 +40,32 @@ public class BattleService {
 
     public BattleStatus processRound(Captain captain1, CaptainAction action1, Captain captain2, CaptainAction action2) {
         // check whether both captains are suitable to play round
-        BattleStatus shipCondition = checkShipConditions(captain1, captain2);
-        if (shipCondition != BattleStatus.ONGOING) return shipCondition;
+        BattleStatus shipConditions = checkShipConditions(captain1, captain2);
+        if (shipConditions != BattleStatus.ONGOING) return shipConditions;
 
         // check if any captain managed to escape or board enemy ship
         TurnOutcome navalPhaseOutcome = this.navalCombatService.resolveNavalPhase(captain1, action1, captain2, action2);
-        if (navalPhaseOutcome == TurnOutcome.CREW_FIGHT_INITIATED) {
-            return resolveCrewFight(captain1, captain2);
-        } else if (navalPhaseOutcome == TurnOutcome.CAPTAIN_ESCAPED) {
-            return BattleStatus.CAPTAIN_ESCAPED;
-        }
-        // TurnOutcome.ONGOING:
-        else {
-            // determine damage dealt by canon fire
-            BattleStatus shipConditions = checkShipConditions(captain1, captain2);
-            switch (shipConditions) {
-                case CAPTAIN1_DEFEATED -> captain2.getShip().repair();
-                case CAPTAIN2_DEFEATED -> captain1.getShip().repair();
+        switch (navalPhaseOutcome) {
+            case CREW_FIGHT_INITIATED -> {
+                return resolveCrewFight(captain1, captain2);
             }
-            // todo Log the battle to database?
-            return shipConditions;
+            case CAPTAIN_ESCAPED -> {
+                return BattleStatus.CAPTAIN_ESCAPED;
+            }
+            case ONGOING -> {
+                // determine damage dealt by canon fire
+                shipConditions = checkShipConditions(captain1, captain2);
+                // if battle should end winner is repaired
+                if ((shipConditions) == BattleStatus.CAPTAIN1_DEFEATED) {
+                    captain2.getShip().repair();
+                } else if (shipConditions == BattleStatus.CAPTAIN2_DEFEATED) {
+                    captain1.getShip().repair();
+                }
+                // todo Log the battle to database?
+                return shipConditions;
+            }
+            case null -> throw new IllegalArgumentException("Turn outcome cannot be null");
+            default -> throw new IllegalStateException("Unexpected value: " + navalPhaseOutcome);
         }
     }
 
@@ -93,7 +99,7 @@ public class BattleService {
         switch (crewState) {
             case CAPTAIN1_DEFEATED -> takeOverShip(captain2, captain1);
             case CAPTAIN2_DEFEATED -> takeOverShip(captain1, captain2);
-            default -> {} //todo Co zrobić w takiej sytuacji? Nie powinna być możliwa!
+            default -> throw new IllegalArgumentException("Unexpected value: " + crewState);
         }
         return crewState;
     }
