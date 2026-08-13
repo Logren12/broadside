@@ -108,4 +108,11 @@ public class BattleService {
         if (captain2.getShip().isDestroyed()) return BattleStatus.CAPTAIN2_DEFEATED;
         else return BattleStatus.ONGOING;
     }
+    private void takeOverShip(Captain winner, Captain loser){
+        if (winner.getShip().getType().getTier() <= loser.getShip().getType().getTier()) {
+            winner.changeShip(loser.getShip());
+            winner.getShip().repair();
+        }
+
+    }
 }

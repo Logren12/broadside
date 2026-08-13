@@ -24,10 +24,10 @@ public class Captain {
     private Faction faction;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "shipId")
+    @JoinColumn(name = "ship_id")
     private Ship ship;
-    private int sailing;
-    private int leadership;
+    private int sailing = 1;
+    private int leadership = 1;
     private boolean bot;
 
     public Captain(String name, Faction faction, Ship ship, int sailingModifier, int leadershipModifier, boolean bot) {
@@ -88,10 +88,9 @@ public class Captain {
         return damage;
     }
     public void changeShip(Ship newShip){
-        if (newShip.getType().tier > this.ship.getType().tier) {
-            this.ship = newShip;
-        }
+        this.ship = newShip;
     }
+
     public CaptainAction decideAction() {
         if (this.getShip().getCanons() <= 0) return CaptainAction.BOARD;
         return CaptainAction.FIRE;
@@ -99,9 +98,9 @@ public class Captain {
 
     public void levelUp(SkillType skillType){
         switch(skillType){
-            case SAILING -> this.sailing ++;
-            case LEADERSHIP -> this.leadership ++;
-            default -> throw new IllegalStateException("Unhandled skill type: " + skillType);
+            case SAILING -> sailing ++;
+            case LEADERSHIP -> leadership ++;
+            default -> throw new IllegalArgumentException("Unhandled skill type: " + skillType);
         }
     }
 

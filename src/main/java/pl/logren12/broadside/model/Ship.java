@@ -27,35 +27,39 @@ public class Ship {
         repair();
     }
     public void repair(){
-        this.hull = this.type.maxHull;
-        this.hold = this.type.maxHold;
-        this.sails = this.type.maxSails;
-        this.canons = this.type.maxCanons;
-        this.crew = this.type.maxCrew;
+        this.hull = this.type.getMaxHull();
+        this.hold = this.type.getMaxHold();
+        this.sails = this.type.getMaxSails();
+        this.canons = this.type.getMaxCanons();
+        this.crew = this.type.getMaxCrew();
     }
+
     public void receiveDamage(List<Integer> locationsHit){
         for(int location : locationsHit){
+            if(isDestroyed()) break;
+
             switch (location) {
                 case 1 -> {
-                    if (this.hold > 0) this.hold--;
-                    else this.hull--;
+                    if (hold > 0) hold--;
+                    else hull--;
                 }
                 case 2 -> {
-                    if (this.sails > 0) this.sails--;
-                    else this.hull--;
+                    if (sails > 0) sails--;
+                    else hull--;
                 }
                 case 3 -> {
-                    if (this.canons > 0) this.canons--;
-                    else this.hull--;
+                    if (canons > 0) canons--;
+                    else hull--;
                 }
                 case 4 -> {
-                    if (this.crew > 0) this.crew--;
-                    else this.hull--;
+                    if (crew > 0) crew--;
+                    else hull--;
                 }
                 default -> throw new IllegalArgumentException("Location out of bound (1-4): " + location);
             }
         }
     }
+
     public boolean isDestroyed(){
         return this.hull <= 0;
     }
