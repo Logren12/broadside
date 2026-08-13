@@ -76,6 +76,10 @@ public class BattleService {
     }
 
     private BattleStatus resolveCrewFight(Captain captain1, Captain captain2) {
+        // check whether ships are not destroyed
+        BattleStatus shipCondition = checkShipConditions(captain1, captain2);
+        if (shipCondition != BattleStatus.ONGOING) return shipCondition;
+
         BattleStatus crewState = checkCrewState(captain1, captain2);
         while (crewState == BattleStatus.ONGOING) {
             int damage1 = captain1.crewAttack();
@@ -84,13 +88,11 @@ public class BattleService {
             captain2.getShip().receiveDamage(Collections.nCopies(damage1, 4));
             crewState = checkCrewState(captain1, captain2);
         }
-        if (crewState == BattleStatus.CAPTAIN1_DEFEATED) {
-            captain2.changeShip(captain1.getShip());
-            captain2.getShip().repair();
-        }
-        if (crewState == BattleStatus.CAPTAIN2_DEFEATED) {
-            captain1.changeShip(captain2.getShip());
-            captain1.getShip().repair();
+
+        switch (crewState) {
+            case CAPTAIN1_DEFEATED -> takeOverShip(captain2, captain1);
+            case CAPTAIN2_DEFEATED -> takeOverShip(captain1, captain2);
+            default -> {} //todo Co zrobić w takiej sytuacji? Nie powinna być możliwa!
         }
         return crewState;
     }
@@ -99,14 +101,14 @@ public class BattleService {
         if (captain1.getShip().getCrew() <= 0 && captain2.getShip().getCrew() <= 0) return BattleStatus.BOTH_DESTROYED;
         if (captain1.getShip().getCrew() <= 0) return BattleStatus.CAPTAIN1_DEFEATED;
         if (captain2.getShip().getCrew() <= 0) return BattleStatus.CAPTAIN2_DEFEATED;
-        else return BattleStatus.ONGOING;
+        return BattleStatus.ONGOING;
     }
 
     private BattleStatus checkShipConditions(Captain captain1, Captain captain2) {
         if (captain1.getShip().isDestroyed() && captain2.getShip().isDestroyed()) return BattleStatus.BOTH_DESTROYED;
         if (captain1.getShip().isDestroyed()) return BattleStatus.CAPTAIN1_DEFEATED;
         if (captain2.getShip().isDestroyed()) return BattleStatus.CAPTAIN2_DEFEATED;
-        else return BattleStatus.ONGOING;
+        return BattleStatus.ONGOING;
     }
     private void takeOverShip(Captain winner, Captain loser){
         if (winner.getShip().getType().getTier() <= loser.getShip().getType().getTier()) {

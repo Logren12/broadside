@@ -42,6 +42,7 @@ public class BattleController {
     }
     @PostMapping("/create-battle")
     public Battle createBattle(@RequestParam String captain1Name, @RequestParam String captain2Name){
+        // todo Check whether captains exist in database
         return battleService.startABattle(captain1Name, captain2Name);
     }
 }

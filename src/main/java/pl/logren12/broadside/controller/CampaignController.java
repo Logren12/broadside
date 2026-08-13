@@ -10,6 +10,7 @@ import pl.logren12.broadside.service.PlayerService;
 import java.util.List;
 
 @RestController
+@RequestMapping("/campaign")
 public class CampaignController {
 
     private final PlayerService playerService;
@@ -34,7 +35,7 @@ public class CampaignController {
             return this.playerService.createPlayerCaptain(name, faction, shipType,0,0);
         }
     }
-    @GetMapping("/stat-check")
+    @GetMapping("/captains")
     public ResponseEntity<List<Captain>> statCheck(
             @RequestParam(required = false) Long id,
             @RequestParam(required = false) String captainName,
