@@ -40,8 +40,8 @@ public class Captain {
         this.name = name;
         this.faction = faction;
         this.ship = ship;
-        this.sailing = faction.baseSailingSkill + sailingModifier;
-        this.leadership = faction.baseLeadershipSkill + leadershipModifier;
+        this.sailing = faction.getBaseSailingSkill() + sailingModifier;
+        this.leadership = faction.getBaseLeadershipSkill() + leadershipModifier;
         this.bot = bot;
     }
 
