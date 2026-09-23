@@ -12,10 +12,6 @@ public class AiService {
         this.captainRepository = captainRepository;
     }
 
-    public Captain createAiCaptain(String name, Faction faction, ShipType shiptype){
-        Captain aiCaptain = new Captain(name, faction, new Ship(shiptype));
-        return captainRepository.save(aiCaptain);
-    }
     /**
      * Simulates decision based on aiCaptain's Ship's state.
      */
