@@ -49,7 +49,7 @@ public class Captain {
     public Captain(String name, Faction faction, Ship ship) {
         this(name, faction, ship, 0,0, true);
     }
-    public List<Integer> rollTheDice(int noDice){
+    private List<Integer> rollTheDice(int noDice){
         List<Integer> diceRoll = new ArrayList<>(noDice);
         for(int i = 0; i < noDice; i++){
             int roll = ThreadLocalRandom.current().nextInt(1, 7);
