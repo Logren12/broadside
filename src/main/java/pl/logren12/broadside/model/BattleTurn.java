@@ -7,12 +7,12 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name="battleRounds")
-public class BattleRound {
+@Table(name="battleTurns")
+public class BattleTurn {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private int roundNumber;
+    private int turnNumber;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="battleId")
     private Battle battle;
@@ -25,7 +25,7 @@ public class BattleRound {
 }
 
 /*
-id  roundNumber battleId    captain1Action  captain2Action  turnOutcome
+id  turnNumber battleId    captain1Action  captain2Action  turnOutcome
 1   1           1           FIRE            FIRE            ONGOING
 2   2           1           FIRE            FIRE            ONGOING
 3   1           2           FIRE            BOARD           CREW_FIGHT_INITIATED
