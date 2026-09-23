@@ -45,7 +45,9 @@ public class Captain {
         this.bot = bot;
     }
 
-    // bot constructor (no modifiers)
+    /**
+    * bot constructor (no modifiers)
+    */
     public Captain(String name, Faction faction, Ship ship) {
         this(name, faction, ship, 0,0, true);
     }
