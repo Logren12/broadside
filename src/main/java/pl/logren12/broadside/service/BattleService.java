@@ -3,7 +3,7 @@ package pl.logren12.broadside.service;
 import org.springframework.stereotype.Service;
 import pl.logren12.broadside.model.*;
 import pl.logren12.broadside.repository.BattleRepository;
-import pl.logren12.broadside.repository.BattleRoundRepository;
+import pl.logren12.broadside.repository.BattleTurnRepository;
 import pl.logren12.broadside.repository.CaptainRepository;
 
 import java.util.Collections;
@@ -14,32 +14,33 @@ public class BattleService {
     private final AiService aiService;
     private final CaptainRepository captainRepository;
     private final BattleRepository battleRepository;
-    private final BattleRoundRepository battleRoundRepository;
+    private final BattleTurnRepository battleTurnRepository;
 
-    public BattleService(NavalCombatService navalCombatService, AiService aiService, CaptainRepository captainRepository, BattleRepository battleRepository, BattleRoundRepository battleRoundRepository) {
+    public BattleService(NavalCombatService navalCombatService, AiService aiService, CaptainRepository captainRepository, BattleRepository battleRepository, BattleTurnRepository battleTurnRepository) {
         this.navalCombatService = navalCombatService;
         this.aiService = aiService;
         this.captainRepository = captainRepository;
         this.battleRepository = battleRepository;
-        this.battleRoundRepository = battleRoundRepository;
+        this.battleTurnRepository = battleTurnRepository;
     }
 
     /**
      * Processes a full turn between two captains.
      * <p/>
-     * First checks whether both captains are able to perform round. Then invokes NavalCombatService
+     * First checks whether both captains are able to perform turn. Then invokes NavalCombatService
      * to determine who won maneuvering phase and
      * (if needed) performs crew fight or pases on information about player's successful escape.
      */
     public Battle startABattle(String captain1Name, String captain2Name){
+        // toDo i need to add validation
         Captain captain1 = captainRepository.findByName(captain1Name).getFirst();
         Captain captain2 = captainRepository.findByName(captain2Name).getFirst();
         Battle battle = new Battle(captain1, captain2);
         return battleRepository.save(battle);
     }
 
-    public BattleStatus processRound(Captain captain1, CaptainAction action1, Captain captain2, CaptainAction action2) {
-        // check whether both captains are suitable to play round
+    public BattleStatus processTurn(Captain captain1, CaptainAction action1, Captain captain2, CaptainAction action2) {
+        // check whether both captains are suitable to play turn
         BattleStatus shipConditions = checkShipConditions(captain1, captain2);
         if (shipConditions != BattleStatus.ONGOING) return shipConditions;
 
@@ -70,16 +71,16 @@ public class BattleService {
     }
 
     // Player versus Bot
-    public BattleStatus processRound(Captain captain1, CaptainAction action1, Captain captain2) {
+    public BattleStatus processTurn(Captain captain1, CaptainAction action1, Captain captain2) {
         CaptainAction action2 = this.aiService.aiActionDecision(captain2);
-        return this.processRound(captain1, action1, captain2, action2);
+        return this.processTurn(captain1, action1, captain2, action2);
     }
 
     // Bot versus Bot
-    public BattleStatus processRound(Captain captain1, Captain captain2) {
+    public BattleStatus processTurn(Captain captain1, Captain captain2) {
         CaptainAction action1 = this.aiService.aiActionDecision(captain1);
         CaptainAction action2 = this.aiService.aiActionDecision(captain2);
-        return this.processRound(captain1, action1, captain2, action2);
+        return this.processTurn(captain1, action1, captain2, action2);
     }
 
     private BattleStatus resolveCrewFight(Captain captain1, Captain captain2) {

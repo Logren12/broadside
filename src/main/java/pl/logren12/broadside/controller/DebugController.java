@@ -1,10 +1,14 @@
 package pl.logren12.broadside.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import pl.logren12.broadside.model.*;
 import pl.logren12.broadside.service.BattleService;
 
+@RestController
+@RequestMapping("/api/debugging")
 public class DebugController {
     // services
     private final BattleService battleService;
@@ -13,7 +17,7 @@ public class DebugController {
         this.battleService = battleService;
     }
 
-    @GetMapping("/api/test-turn")
+    @GetMapping("/test-turn")
     public String testTurn(@RequestParam(defaultValue = "ESCAPE") CaptainAction action) {
         Ship mockShip = new Ship(ShipType.SHIP_OF_THE_LINE);
         Ship mockShip2 = new Ship(ShipType.SLOOP);
@@ -25,7 +29,7 @@ public class DebugController {
         response.append(String.format("Captain1: %s, Captain2: %s", mockCaptain.getName(), mockCaptain2.getName()));
         response.append(String.format("Action1: %s, Action2: %s", action, action2));
         response.append("BattleTurn outcome:");
-        response.append(battleService.processRound(mockCaptain, action, mockCaptain2, action2).toString());
+        response.append(battleService.processTurn(mockCaptain, action, mockCaptain2, action2).toString());
         return response.toString();
     }
 }
