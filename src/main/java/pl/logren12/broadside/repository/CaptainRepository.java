@@ -11,4 +11,5 @@ import java.util.List;
 public interface CaptainRepository extends JpaRepository<Captain, Long> {
     List<Captain> findByName(String name);
     List<Captain> findByFaction(Faction faction);
+    List<Captain> findByBot(boolean bot);
 }
