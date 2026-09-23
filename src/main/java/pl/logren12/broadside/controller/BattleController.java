@@ -1,6 +1,8 @@
 package pl.logren12.broadside.controller;
 
+import jakarta.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import pl.logren12.broadside.model.*;
@@ -8,6 +10,7 @@ import pl.logren12.broadside.repository.BattleRepository;
 import pl.logren12.broadside.service.BattleService;
 
 @RestController
+@Validated
 @RequestMapping("/api/battles")
 public class BattleController {
     // services
@@ -28,5 +31,10 @@ public class BattleController {
     public Battle createBattle(@RequestParam String captain1Name, @RequestParam String captain2Name){
         // todo Check whether captains exist in database
         return battleService.startABattle(captain1Name, captain2Name);
+    }
+    @PostMapping("/{battleId}/turns")
+    public TurnOutcome playTurn(@RequestParam Long captainId ,@RequestParam CaptainAction captainAction, @RequestParam @Positive int turnNumber) {
+        // todo Why Long not long in captainId?
+        return TurnOutcome.CAPTAIN_ESCAPED; // todo Delete and write actual resolver
     }
 }
