@@ -36,7 +36,7 @@ public class CaptainController {
     public List<Captain> searchCaptains(
             @RequestParam(required = false) @Size(max = 25) String name,
             @RequestParam(required = false) Faction faction,
-            @RequestParam(required = false) Boolean bot) //Boolean and not boolean to have 3 states to make it possible to search for non bots! Diffrentiate omitting filter and speficying false
+            @RequestParam(required = false) Boolean bot) //Boolean and not boolean to have 3 states to make it possible to search for non bots! Differentiate omitting filter and specifying false
     {
         return captainService.search(name, faction, bot);
     }
