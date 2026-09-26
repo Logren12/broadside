@@ -29,7 +29,7 @@ public class Battle {
     }
 }
 /*
-id  captain1Id  captain2Id  currentTurn                                 status
-1   1           2           13                                          CAPTAIN2DEFEATED
-3   1           3           3                                           ONGOING
+id  captain1Id  captain2Id  currentTurn     status
+1   1           2           13              CAPTAIN2DEFEATED
+3   1           3           3               ONGOING
 * */
