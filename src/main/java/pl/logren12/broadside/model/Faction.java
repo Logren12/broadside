@@ -8,7 +8,7 @@ public enum Faction {
     FRENCH(1, 4),
     SPANISH(2, 3),
     DUTCH(3, 2),
-    PIRATE(1, 6);
+    PIRATE(1, 5);
 
     private final int baseSailingSkill;
     private final int baseLeadershipSkill;
