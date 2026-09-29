@@ -1,13 +1,15 @@
 package pl.logren12.broadside.model;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@Table(name="battles")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "battles")
 public class Battle {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
