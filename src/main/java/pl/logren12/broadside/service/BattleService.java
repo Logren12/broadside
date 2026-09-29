@@ -1,22 +1,25 @@
 package pl.logren12.broadside.service;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import pl.logren12.broadside.model.*;
 import pl.logren12.broadside.repository.BattleRepository;
 import pl.logren12.broadside.repository.BattleTurnRepository;
 import pl.logren12.broadside.repository.CaptainRepository;
 
-import java.util.Collections;
+import java.util.Objects;
 
 @Service
 public class BattleService {
-    private final NavalCombatService navalCombatService;
+    private final TurnService turnService;
     private final CaptainRepository captainRepository;
     private final BattleRepository battleRepository;
     private final BattleTurnRepository battleTurnRepository;
 
-    public BattleService(NavalCombatService navalCombatService, CaptainRepository captainRepository, BattleRepository battleRepository, BattleTurnRepository battleTurnRepository) {
-        this.navalCombatService = navalCombatService;
+    public BattleService(TurnService turnService, CaptainRepository captainRepository, BattleRepository battleRepository, BattleTurnRepository battleTurnRepository) {
+        this.turnService = turnService;
         this.captainRepository = captainRepository;
         this.battleRepository = battleRepository;
         this.battleTurnRepository = battleTurnRepository;
@@ -74,12 +77,6 @@ public class BattleService {
         return this.processTurn(captain1, action1, captain2, action2);
     }
 
-    // Bot versus Bot
-    public BattleStatus processTurn(Captain captain1, Captain captain2) {
-        CaptainAction action1 = captain1.decideAction();
-        CaptainAction action2 = captain2.decideAction();
-        return this.processTurn(captain1, action1, captain2, action2);
-    }
 
     private BattleStatus resolveCrewFight(Captain captain1, Captain captain2) {
         // check whether ships are not destroyed
