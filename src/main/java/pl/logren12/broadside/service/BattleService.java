@@ -25,100 +25,89 @@ public class BattleService {
         this.battleTurnRepository = battleTurnRepository;
     }
 
-    /**
-     * Processes a full turn between two captains.
-     * <p/>
-     * First checks whether both captains are able to perform turn. Then invokes NavalCombatService
-     * to determine who won maneuvering phase and
-     * (if needed) performs crew fight or pases on information about player's successful escape.
+    @Transactional
+    public Battle startABattle(String name1, String name2) {
+    /* todo i need to add validation?
+        How do I want creating matches to work? Do i want to make a matchmaker? Or do i want to allow any battle?
+        Do i want to implement something like the board game that you may attack only targets that server finds you?
+        Or do you always attack what i want you to attack?
+        Do i want to add a campaign?
+        Do i want to add trade, upgrading ship and things like that? Hell yes but is this a correct project (and framework) for that?
+        I dont think so.
      */
-    public Battle startABattle(String captain1Name, String captain2Name){
-        // toDo i need to add validation
-        Captain captain1 = captainRepository.findByName(captain1Name).getFirst();
-        Captain captain2 = captainRepository.findByName(captain2Name).getFirst();
-        Battle battle = new Battle(captain1, captain2);
-        return battleRepository.save(battle);
+        Captain c1 = captainRepository.findByName(name1);
+        Captain c2 = captainRepository.findByName(name2);
+        Battle battle = new Battle(c1, c2);
+        battleRepository.save(battle);
+        return battle;
     }
 
-    public BattleStatus processTurn(Captain captain1, CaptainAction action1, Captain captain2, CaptainAction action2) {
-        // check whether both captains are suitable to play turn
-        BattleStatus shipConditions = checkShipConditions(captain1, captain2);
-        if (shipConditions != BattleStatus.ONGOING) return shipConditions;
+    @Transactional
+    public TurnOutcome registerTurn(long battleId, Long captainId, CaptainAction action, int turnNumber) {
+        // 1. validation: check if battle exist and captain with captainId participates in that battle
+        Battle battle = battleRepository.findById(battleId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Battle not found"));
 
-        // check if any captain managed to escape or board enemy ship
-        TurnOutcome navalPhaseOutcome = this.navalCombatService.resolveNavalPhase(captain1, action1, captain2, action2);
-        switch (navalPhaseOutcome) {
-            case CREW_FIGHT_INITIATED -> {
-                return resolveCrewFight(captain1, captain2);
+        if (!battle.isCaptain1(captainId) && !battle.isCaptain2(captainId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Wrong battle");//FIXME write better message
+        }
+
+        // then check whether turnNumber is equal to battle.getCurrentTurn and not already registered
+        if (battle.getCurrentTurn() != turnNumber) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Wrong turn");
+        }
+        // todo how to check whether the answer is not already submitted?
+        battleTurnRepository.findByBattleIdAndTurnNumber(battleId, turnNumber);
+        // Możliwe scenariusze:
+        // nie ma takiego rekordu -> jesteśmy pierwsi – tworzymy!
+        // Ktoś już stworzył rekord tury i jesteśmy drudzy – rekord istnieje, sprawdzamy, czy ma naszą odpowiedź.
+
+
+        // 2. create a waiting object with captain, captain action, and awaiting second captain decision
+        // and return status (awaiting for other player or evaluate if oponent is AI)
+        Captain captain;
+        Captain opponent;
+
+        if (battle.isCaptain1(captainId)) {
+            captain = battle.getCaptain1();
+            opponent = battle.getCaptain2();
+        } else {
+            captain = battle.getCaptain2();
+            opponent = battle.getCaptain1();
+        }
+
+        if (opponent.isBot()) {
+            turnService.processTurn(captain, action, opponent); //todo make processTurn process by turnId?
+            BattleTurn turn = battleTurnRepository.findByBattleId(battle.getId()).getLast();
+            return turn.getOutcome();
+        } else {
+            if (battle.isCaptain1(captainId)) {
+                BattleTurn turn = BattleTurn.forCaptain1(battle, turnNumber, action);
+                battleTurnRepository.save(turn);
+                return turn.getOutcome();
+
+            } else {
+                BattleTurn turn = BattleTurn.forCaptain2(battle, turnNumber, action);
+                battleTurnRepository.save(turn);
+                return turn.getOutcome();
             }
-            case CAPTAIN_ESCAPED -> {
-                return BattleStatus.CAPTAIN_ESCAPED;
-            }
-            case ONGOING -> {
-                // determine damage dealt by canon fire
-                shipConditions = checkShipConditions(captain1, captain2);
-                // if battle should end winner is repaired
-                if ((shipConditions) == BattleStatus.CAPTAIN1_DEFEATED) {
-                    captain2.getShip().repair();
-                } else if (shipConditions == BattleStatus.CAPTAIN2_DEFEATED) {
-                    captain1.getShip().repair();
-                }
-                // FIXME Log the battle to database
-                return shipConditions;
-            }
-            case null -> throw new IllegalArgumentException("Turn outcome cannot be null");
-            default -> throw new IllegalStateException("Unexpected value: " + navalPhaseOutcome);
         }
     }
 
-    // Player versus Bot
-    public BattleStatus processTurn(Captain captain1, CaptainAction action1, Captain captain2) {
-        CaptainAction action2 = captain2.decideAction();
-        return this.processTurn(captain1, action1, captain2, action2);
-    }
-
-
-    private BattleStatus resolveCrewFight(Captain captain1, Captain captain2) {
-        // check whether ships are not destroyed
-        BattleStatus shipCondition = checkShipConditions(captain1, captain2);
-        if (shipCondition != BattleStatus.ONGOING) return shipCondition;
-
-        BattleStatus crewState = checkCrewState(captain1, captain2);
-        while (crewState == BattleStatus.ONGOING) {
-            int damage1 = captain1.crewAttack();
-            int damage2 = captain2.crewAttack();
-            captain1.getShip().receiveDamage(Collections.nCopies(damage2, 4)); // 4 is a crew code in receiveDamage
-            captain2.getShip().receiveDamage(Collections.nCopies(damage1, 4));
-            crewState = checkCrewState(captain1, captain2);
+    public TurnOutcome sendOutcome(Long captainId, long battleId, int turnNumber) {
+        // todo: Ensure validation works correctly
+        if (captainId == null){
+            throw new  ResponseStatusException(HttpStatus.BAD_REQUEST, "Captain id is null");
         }
-
-        switch (crewState) {
-            case CAPTAIN1_DEFEATED -> takeOverShip(captain2, captain1);
-            case CAPTAIN2_DEFEATED -> takeOverShip(captain1, captain2);
-            default -> throw new IllegalArgumentException("Unexpected value: " + crewState);
+        // todo: Decision: Do i want to send any turn outcome or only current turn outcome?
+        Battle battle = battleRepository.findById(battleId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Battle not found") {
+        });
+        if (!Objects.equals(battle.getCaptain1().getId(), captainId) && !Objects.equals(battle.getCaptain2().getId(), captainId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Wrong battle");
+        } else {
+            Captain captain = (captainId.equals(battle.getCaptain1().getId())) ? battle.getCaptain1() : battle.getCaptain2(); // todo Czy jest jakiś lepszy sposób na przeszukanie bazy szukając kapitana?
         }
-        return crewState;
-    }
-
-    private BattleStatus checkCrewState(Captain captain1, Captain captain2) {
-        if (captain1.getShip().crewIsDead() && captain2.getShip().crewIsDead()) return BattleStatus.BOTH_DESTROYED;
-        if (captain1.getShip().crewIsDead()) return BattleStatus.CAPTAIN1_DEFEATED;
-        if (captain2.getShip().crewIsDead()) return BattleStatus.CAPTAIN2_DEFEATED;
-        return BattleStatus.ONGOING;
-    }
-
-    private BattleStatus checkShipConditions(Captain captain1, Captain captain2) {
-        if (captain1.getShip().isDestroyed() && captain2.getShip().isDestroyed()) return BattleStatus.BOTH_DESTROYED;
-        if (captain1.getShip().isDestroyed()) return BattleStatus.CAPTAIN1_DEFEATED;
-        if (captain2.getShip().isDestroyed()) return BattleStatus.CAPTAIN2_DEFEATED;
-        return BattleStatus.ONGOING;
-    }
-
-    private void takeOverShip(Captain winner, Captain loser) {
-        if (winner.getShip().getType().getTier() <= loser.getShip().getType().getTier()) {
-            winner.changeShip(loser.getShip());
-            winner.getShip().repair();
-        }
-
+        BattleTurn turn = battleTurnRepository.findByBattleId(battleId).get(turnNumber - 1); //todo super źle wygląda
+        return turn.getOutcome();
     }
 }
