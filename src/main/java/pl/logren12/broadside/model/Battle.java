@@ -21,15 +21,32 @@ public class Battle {
     @Enumerated(EnumType.STRING)
     private BattleStatus status;
 
-    public Battle(Captain c1, Captain c2){
-        this.captain1 = c1;
-        this.captain2 = c2;
-        this.currentTurn = 0;
+    /**
+     * captain1 is always the captain with the lower id, so the same pair can't exist in two orders.
+     */
+    public Battle(@NonNull Captain c1, @NonNull Captain c2) {
+        if (c1.getId() == null || c2.getId() == null) {
+            throw new IllegalArgumentException("Captains must be saved first");
+        }
+        if (c1.getId().equals(c2.getId())) {
+            throw new IllegalArgumentException("Captain can't fight with themself!");
+        }
+        if (c1.getId() < c2.getId()) {
+            this.captain1 = c1;
+            this.captain2 = c2;
+        } else {
+            this.captain1 = c2;
+            this.captain2 = c1;
+        }
+        this.currentTurn = 1;
         this.status = BattleStatus.ONGOING;
     }
+
+    public boolean isCaptain1(long captainId) {
+        return captain1.getId().equals(captainId);
+    }
+
+    public boolean isCaptain2(long captainId) {
+        return captain2.getId().equals(captainId);
+    }
 }
-/*
-id  captain1Id  captain2Id  currentTurn     status
-1   1           2           13              CAPTAIN2DEFEATED
-3   1           3           3               ONGOING
-* */
