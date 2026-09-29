@@ -3,6 +3,7 @@ package pl.logren12.broadside.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,6 +19,7 @@ public class Captain {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false, length = 25)
     private String name;
 
     @Enumerated(EnumType.STRING)
@@ -30,9 +32,12 @@ public class Captain {
     private int leadership = 1;
     private boolean bot;
 
-    public Captain(String name, Faction faction, Ship ship, int sailingModifier, int leadershipModifier, boolean bot) {
-        if (sailingModifier < 0){
-            throw new IllegalArgumentException("Modifiers cannot be negative: " + sailingModifier);
+    public Captain(@NonNull String name, Faction faction, Ship ship, int sailingModifier, int leadershipModifier, boolean bot) {
+       if (name.isBlank()){
+           throw new IllegalArgumentException("name must not be blank");
+       }
+        if (sailingModifier < 0) {
+            throw new IllegalArgumentException("modifiers cannot be negative: " + sailingModifier);
         }
         if (leadershipModifier < 0) {
             throw new IllegalArgumentException("modifiers cannot be negative: " + leadershipModifier);
