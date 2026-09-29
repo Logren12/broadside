@@ -20,7 +20,7 @@ public class CaptainService {
         this.captainRepository = captainRepository;
     }
 
-    public Captain create(@NonNull String name, @NonNull Faction faction, @NonNull ShipType shipType, int sailingModifier, int leadershipModifier, boolean bot) {
+    public Captain create(@NonNull String name, @NonNull Faction faction, @NonNull ShipType shipType, boolean bot) {
         if (name.isBlank()) {
             throw new IllegalArgumentException("Name cannot be blank");
         }
@@ -34,7 +34,7 @@ public class CaptainService {
             newCaptain = new Captain(name, faction, new Ship(shipType));
 
         } else {
-            newCaptain = new Captain(name, faction, new Ship(shipType), sailingModifier, leadershipModifier, false);
+            newCaptain = new Captain(name, faction, new Ship(shipType), false);
         }
         return this.captainRepository.save(newCaptain);
     }

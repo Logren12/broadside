@@ -32,21 +32,15 @@ public class Captain {
     private int leadership = 1;
     private boolean bot;
 
-    public Captain(@NonNull String name, Faction faction, Ship ship, int sailingModifier, int leadershipModifier, boolean bot) {
+    public Captain(@NonNull String name, Faction faction, Ship ship, boolean bot) {
        if (name.isBlank()){
            throw new IllegalArgumentException("name must not be blank");
        }
-        if (sailingModifier < 0) {
-            throw new IllegalArgumentException("modifiers cannot be negative: " + sailingModifier);
-        }
-        if (leadershipModifier < 0) {
-            throw new IllegalArgumentException("modifiers cannot be negative: " + leadershipModifier);
-        }
         this.name = name;
         this.faction = faction;
         this.ship = ship;
-        this.sailing = faction.getBaseSailingSkill() + sailingModifier;
-        this.leadership = faction.getBaseLeadershipSkill() + leadershipModifier;
+        this.sailing = faction.getBaseSailingSkill();
+        this.leadership = faction.getBaseLeadershipSkill();
         this.bot = bot;
     }
 
@@ -54,7 +48,7 @@ public class Captain {
      * bot constructor (no modifiers)
      */
     public Captain(String name, Faction faction, Ship ship) {
-        this(name, faction, ship, 0, 0, true);
+        this(name, faction, ship, true);
     }
 
     private List<Integer> rollTheDice(int noDice) {

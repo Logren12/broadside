@@ -26,10 +26,10 @@ public class CaptainController {
                                  @RequestParam(defaultValue = "true") boolean bot) {
         //todo Add/implement modifiers
         if (bot){
-            return this.captainService.create(name, faction, shipType, 0,0,true);
+            return this.captainService.create(name, faction, shipType, true);
         }
         else{
-            return this.captainService.create(name, faction, shipType,0,0, false);
+            return this.captainService.create(name, faction, shipType, false);
         }
     }
     @GetMapping
