@@ -11,14 +11,12 @@ import java.util.Collections;
 @Service
 public class BattleService {
     private final NavalCombatService navalCombatService;
-    private final AiService aiService;
     private final CaptainRepository captainRepository;
     private final BattleRepository battleRepository;
     private final BattleTurnRepository battleTurnRepository;
 
-    public BattleService(NavalCombatService navalCombatService, AiService aiService, CaptainRepository captainRepository, BattleRepository battleRepository, BattleTurnRepository battleTurnRepository) {
+    public BattleService(NavalCombatService navalCombatService, CaptainRepository captainRepository, BattleRepository battleRepository, BattleTurnRepository battleTurnRepository) {
         this.navalCombatService = navalCombatService;
-        this.aiService = aiService;
         this.captainRepository = captainRepository;
         this.battleRepository = battleRepository;
         this.battleTurnRepository = battleTurnRepository;
@@ -72,14 +70,14 @@ public class BattleService {
 
     // Player versus Bot
     public BattleStatus processTurn(Captain captain1, CaptainAction action1, Captain captain2) {
-        CaptainAction action2 = this.aiService.aiActionDecision(captain2);
+        CaptainAction action2 = captain2.decideAction();
         return this.processTurn(captain1, action1, captain2, action2);
     }
 
     // Bot versus Bot
     public BattleStatus processTurn(Captain captain1, Captain captain2) {
-        CaptainAction action1 = this.aiService.aiActionDecision(captain1);
-        CaptainAction action2 = this.aiService.aiActionDecision(captain2);
+        CaptainAction action1 = captain1.decideAction();
+        CaptainAction action2 = captain2.decideAction();
         return this.processTurn(captain1, action1, captain2, action2);
     }
 
