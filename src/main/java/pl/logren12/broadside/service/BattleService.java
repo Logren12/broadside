@@ -60,7 +60,7 @@ public class BattleService {
                 } else if (shipConditions == BattleStatus.CAPTAIN2_DEFEATED) {
                     captain1.getShip().repair();
                 }
-                // todo Log the battle to database?
+                // FIXME Log the battle to database
                 return shipConditions;
             }
             case null -> throw new IllegalArgumentException("Turn outcome cannot be null");
@@ -116,7 +116,8 @@ public class BattleService {
         if (captain2.getShip().isDestroyed()) return BattleStatus.CAPTAIN2_DEFEATED;
         return BattleStatus.ONGOING;
     }
-    private void takeOverShip(Captain winner, Captain loser){
+
+    private void takeOverShip(Captain winner, Captain loser) {
         if (winner.getShip().getType().getTier() <= loser.getShip().getType().getTier()) {
             winner.changeShip(loser.getShip());
             winner.getShip().repair();

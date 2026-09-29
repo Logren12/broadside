@@ -21,11 +21,11 @@ public class CaptainService {
     public Captain create(String name, Faction faction, ShipType shipType, int sailingModifier, int leadershipModifier, boolean bot){
         // todo Add a check for already taken name
         Captain newCaptain;
-        if (bot){
+        if (bot) {
             newCaptain = new Captain(name, faction, new Ship(shipType));
 
-        }else {
-            newCaptain = new Captain(name, faction, new Ship(shipType), sailingModifier, leadershipModifier, bot);
+        } else {
+            newCaptain = new Captain(name, faction, new Ship(shipType), sailingModifier, leadershipModifier, false);
         }
         return this.captainRepository.save(newCaptain);
     }
@@ -43,11 +43,10 @@ public class CaptainService {
             return captainRepository.findByFaction(faction);
         } else if (bot != null && bot) {
             return captainRepository.findByBot(true);
-        }
-        else return captainRepository.findAll();
+        } else return captainRepository.findAll();
     }
 
-    public void levelUp(Captain captain, SkillType skillType){
+    public void levelUp(Captain captain, SkillType skillType) {
         // toDo Czy tutaj nie powinienem przypadkiem otworzyć transakcji?
         Assert.notNull(captain, "Captain cannot be null");
         Assert.notNull(skillType, "Skill type cannot be null");

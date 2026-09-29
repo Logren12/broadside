@@ -23,7 +23,7 @@ public class BattleController {
     }
 
     @GetMapping("/{battleId}")
-    public Battle getBattle(@PathVariable long battleId){
+    public Battle getBattle(@PathVariable long battleId) {
         return this.battleRepository.findById(battleId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Battle not found"));
     }

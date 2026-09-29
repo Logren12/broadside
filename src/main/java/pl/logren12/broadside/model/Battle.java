@@ -14,8 +14,8 @@ public class Battle {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Captain captain1; // powiązane z tabelą kapitanów. Odniesienie trzymamy tutaj. Czyli many to one?
-    @ManyToOne //todo może bez fetch lepsze/gorsze?
+    private Captain captain1;
+    @ManyToOne(fetch = FetchType.LAZY)
     private Captain captain2;
     private int currentTurn;
     @Enumerated(EnumType.STRING)

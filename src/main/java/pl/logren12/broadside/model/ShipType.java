@@ -4,11 +4,11 @@ import lombok.Getter;
 
 @Getter
 public enum ShipType {
-    SLOOP(2,1,2,1,2,1),
-    FLUYT(2,2,1,2,2,2),
-    FRIGATE(3,3,3,3,3,3),
-    GALLEON(4,5,3,3,4,4),
-    SHIP_OF_THE_LINE(5,5,5,5,5,5);
+    SLOOP(2, 1, 2, 1, 2, 1),
+    FLUYT(2, 2, 1, 2, 2, 2),
+    FRIGATE(3, 3, 3, 3, 3, 3),
+    GALLEON(4, 5, 3, 3, 4, 4),
+    SHIP_OF_THE_LINE(5, 5, 5, 5, 5, 5);
 
     private final int maxHull;
     private final int maxHold;

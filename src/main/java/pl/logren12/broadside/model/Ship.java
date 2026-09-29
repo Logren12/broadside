@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @Entity
-@Table(name="ships")
+@Table(name = "ships")
 public class Ship {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,11 +22,12 @@ public class Ship {
     private int canons;
     private int crew;
 
-    public Ship(ShipType type){
+    public Ship(ShipType type) {
         this.type = type;
         repair();
     }
-    public void repair(){
+
+    public void repair() {
         this.hull = this.type.getMaxHull();
         this.hold = this.type.getMaxHold();
         this.sails = this.type.getMaxSails();
@@ -34,9 +35,9 @@ public class Ship {
         this.crew = this.type.getMaxCrew();
     }
 
-    public void receiveDamage(List<Integer> locationsHit){
-        for(int location : locationsHit){
-            if(isDestroyed()) break;
+    public void receiveDamage(List<Integer> locationsHit) {
+        for (int location : locationsHit) {
+            if (isDestroyed()) break;
 
             switch (location) {
                 case 1 -> {
@@ -60,7 +61,7 @@ public class Ship {
         }
     }
 
-    public boolean isDestroyed(){
+    public boolean isDestroyed() {
         return this.hull <= 0;
     }
 }
