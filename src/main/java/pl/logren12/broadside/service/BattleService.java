@@ -104,9 +104,9 @@ public class BattleService {
     }
 
     private BattleStatus checkCrewState(Captain captain1, Captain captain2) {
-        if (captain1.getShip().getCrew() <= 0 && captain2.getShip().getCrew() <= 0) return BattleStatus.BOTH_DESTROYED;
-        if (captain1.getShip().getCrew() <= 0) return BattleStatus.CAPTAIN1_DEFEATED;
-        if (captain2.getShip().getCrew() <= 0) return BattleStatus.CAPTAIN2_DEFEATED;
+        if (captain1.getShip().crewIsDead() && captain2.getShip().crewIsDead()) return BattleStatus.BOTH_DESTROYED;
+        if (captain1.getShip().crewIsDead()) return BattleStatus.CAPTAIN1_DEFEATED;
+        if (captain2.getShip().crewIsDead()) return BattleStatus.CAPTAIN2_DEFEATED;
         return BattleStatus.ONGOING;
     }
 

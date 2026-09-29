@@ -64,4 +64,8 @@ public class Ship {
     public boolean isDestroyed() {
         return this.hull <= 0;
     }
+
+    public boolean crewIsDead() {
+        return this.crew <= 0;
+    }
 }
