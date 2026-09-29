@@ -1,5 +1,6 @@
 package pl.logren12.broadside.service;
 
+import lombok.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -8,6 +9,7 @@ import pl.logren12.broadside.model.*;
 import pl.logren12.broadside.repository.CaptainRepository;
 
 import java.util.List;
+
 
 @Service
 public class CaptainService {
@@ -18,8 +20,15 @@ public class CaptainService {
         this.captainRepository = captainRepository;
     }
 
-    public Captain create(String name, Faction faction, ShipType shipType, int sailingModifier, int leadershipModifier, boolean bot){
-        // todo Add a check for already taken name
+    public Captain create(@NonNull String name, @NonNull Faction faction, @NonNull ShipType shipType, int sailingModifier, int leadershipModifier, boolean bot) {
+        if (name.isBlank()) {
+            throw new IllegalArgumentException("Name cannot be blank");
+        }
+        name = name.trim();
+        if (captainRepository.existsByName(name)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "That name is already taken");
+        }
+        ;
         Captain newCaptain;
         if (bot) {
             newCaptain = new Captain(name, faction, new Ship(shipType));
@@ -38,7 +47,7 @@ public class CaptainService {
     public List<Captain> search(String name, Faction faction, Boolean bot) {
         //todo Implement search logic for multiple arguments (change them to proper filters)
         if (name != null && !name.isBlank()) {
-            return captainRepository.findByName(name);
+            return List.of(captainRepository.findByName(name));
         } else if (faction != null) {
             return captainRepository.findByFaction(faction);
         } else if (bot != null && bot) {
