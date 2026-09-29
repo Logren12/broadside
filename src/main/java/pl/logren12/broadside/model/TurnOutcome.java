@@ -1,7 +1,8 @@
 package pl.logren12.broadside.model;
 
 public enum TurnOutcome {
-    ONGOING,
+    CANNONADE,
     CREW_FIGHT_INITIATED,
-    CAPTAIN_ESCAPED
+    CAPTAIN_ESCAPED,
+    UNFINISHED
 }
