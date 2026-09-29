@@ -28,7 +28,6 @@ public class CaptainService {
         if (captainRepository.existsByName(name)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "That name is already taken");
         }
-        ;
         Captain newCaptain;
         if (bot) {
             newCaptain = new Captain(name, faction, new Ship(shipType));
